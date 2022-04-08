@@ -26,22 +26,22 @@
 
     <form id="form" autocomplete="off">
       <label for="factory">factory address</label>
-      <input placeholder="0x0000000000000000000000000000000000000000" id="factory" required />
+      <input placeholder="0x0000000000000000000000000000000000000000" id="factory" value="0x48817d0d609d38ec19133b5b3b21c583603f84b1" required />
 
       <label for="token">token address</label>
-      <input placeholder="0x0000000000000000000000000000000000000000" id="token" required />
+      <input placeholder="0x0000000000000000000000000000000000000000" id="token" value="0xB4552825fFC9e580a493430BD00E4887110a25cc" required />
 
       <label for="bridge">bridge address</label>
-      <input placeholder="0x0000000000000000000000000000000000000000" id="bridge" required />
+      <input placeholder="0x0000000000000000000000000000000000000000" id="bridge" value="0xF890982f9310df57d00f659cf4fd87e65adEd8d7" required />
 
       <label for="recipient-chain">recipient chain</label>
-      <input placeholder="0" type="number" id="recipient-chain" required />
+      <input placeholder="0" type="number" value="3" id="recipient-chain" required />
 
       <label for="recipient">recipient</label>
-      <input placeholder="0x0000000000000000000000000000000000000000" id="recipient" required />
+      <input placeholder="terra address" id="recipient" required />
 
       <label for="arbiter-fee">arbiter fee</label>
-      <input placeholder="0" id="arbiter-fee" type="number" required />
+      <input placeholder="0" id="arbiter-fee" type="number" value="0" required />
 
       <button type="submit">create jumpgate</button>
       <p id="error"></p>
@@ -132,7 +132,6 @@
           const token = tokenInput.value;
           const bridge = bridgeInput.value;
           const recipientChain = Number(recipientChainInput.value);
-          console.log(recipientChain)
           const recipient = decodeTerraAddress(recipientInput.value);
           const arbiterFee = Number(arbiterFeeInput.value);
 
