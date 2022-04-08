@@ -35,7 +35,7 @@
       <input placeholder="0x0000000000000000000000000000000000000000" id="bridge" required />
 
       <label for="recipient-chain">recipient chain</label>
-      <input placeholder="0" type="number" id="recipient" required />
+      <input placeholder="0" type="number" id="recipient-chain" required />
 
       <label for="recipient">recipient</label>
       <input placeholder="0x0000000000000000000000000000000000000000" id="recipient" required />
@@ -132,6 +132,7 @@
           const token = tokenInput.value;
           const bridge = bridgeInput.value;
           const recipientChain = Number(recipientChainInput.value);
+          console.log(recipientChain)
           const recipient = decodeTerraAddress(recipientInput.value);
           const arbiterFee = Number(arbiterFeeInput.value);
 
