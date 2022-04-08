@@ -20,6 +20,7 @@
     <canvas id="particle"></canvas>
     <div id="account">
       <p>from: <span id="address"></span></p>
+      <p>balance: Ξ<span id="balance"></span></p>
       <p>chain: <span id="chain"></span></p>
     </div>
 
@@ -58,11 +59,16 @@
       let connected;
 
       const addressSpan = document.getElementById("address");
+      const balanceSpan = document.getElementById("balance");
       const chainSpan = document.getElementById("chain");
 
       function updateAccount(accounts) {
         account = accounts[0];
         addressSpan.innerHTML = account;
+      }
+
+      function updateBalance(balance) {
+        balanceSpan.innerHTML = (balance / 10 ** 18).toFixed(2);
       }
 
       function updateChain(chainId) {
@@ -80,9 +86,12 @@
           method: "eth_requestAccounts",
         });
         const chainId = await web3.eth.getChainId();
+        const balance = await web3.eth.getBalance(accounts[0]);
 
         updateAccount(accounts);
+        updateBalance(balance)
         updateChain(chainId);
+
 
         window.ethereum.on("accountsChanged", updateAccount);
         window.ethereum.on("chainChanged", refreshPage);
