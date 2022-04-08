@@ -151,7 +151,6 @@
             )
             .send({ from: account });
 
-          const receipt = await tx.wait(1);
         } catch (error) {
           console.error(error);
           errorP.innerHTML = error.message;
