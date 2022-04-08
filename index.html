@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jumpgate Factory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anonymous+Pro&family=Major+Mono+Display&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1><span class="gear">&#9881;</span> wormhole jumpgate factory <spanc class="gear">&#9881;</span></h1>
+    <canvas id="particle"></canvas>
+    <div id="account">
+      <p>from: <span id="address"></span></p>
+      <p>chain: <span id="chain"></span></p>
+    </div>
+
+    <form id="form" autocomplete="off">
+      <label for="factory">factory address</label>
+      <input placeholder="0x0000000000000000000000000000000000000000" id="factory" required />
+
+      <label for="token">token address</label>
+      <input placeholder="0x0000000000000000000000000000000000000000" id="token" required />
+
+      <label for="bridge">bridge address</label>
+      <input placeholder="0x0000000000000000000000000000000000000000" id="bridge" required />
+
+      <label for="recipient-chain">recipient chain</label>
+      <input placeholder="0" type="number" id="recipient" required />
+
+      <label for="recipient">recipient</label>
+      <input placeholder="0x0000000000000000000000000000000000000000" id="recipient" required />
+
+      <label for="arbiter-fee">arbiter fee</label>
+      <input placeholder="0" id="arbiter-fee" type="number" required />
+
+      <button type="submit">submit</button>
+      <p id="error"></p>
+    </form>
+
+    <script src="blackhole.js" defer></script>
+    <script src="bech32.js" type="module"></script>
+
+    <script type="module">
+      import { decodeTerraAddress } from "./bech32.js";
+
+      let web3;
+      let account;
+      let chain;
+      let connected;
+
+      const addressSpan = document.getElementById("address");
+      const chainSpan = document.getElementById("chain");
+
+      function updateAccount(accounts) {
+        account = accounts[0];
+        addressSpan.innerHTML = account;
+      }
+
+      function updateChain(chainId) {
+        chain = chainId;
+        chainSpan.innerHTML = chain;
+      }
+
+      function refreshPage() {
+        window.location.reload();
+      }
+
+      window.addEventListener("DOMContentLoaded", async () => {
+        web3 = new Web3(window.ethereum);
+        const accounts = await ethereum.request({
+          method: "eth_requestAccounts",
+        });
+        const chainId = await web3.eth.getChainId();
+
+        updateAccount(accounts);
+        updateChain(chainId);
+
+        window.ethereum.on("accountsChanged", updateAccount);
+        window.ethereum.on("chainChanged", refreshPage);
+      });
+
+      const form = document.getElementById("form");
+      const factoryInput = document.getElementById("factory");
+      const tokenInput = document.getElementById("token");
+      const bridgeInput = document.getElementById("bridge");
+      const recipientChainInput = document.getElementById("recipient-chain");
+      const recipientInput = document.getElementById("recipient");
+      const arbiterFeeInput = document.getElementById("arbiter-fee");
+
+      const errorP = document.getElementById("error");
+
+      const factoryAbi = [
+        {
+          inputs: [
+            { internalType: "address", name: "_token", type: "address" },
+            { internalType: "address", name: "_bridge", type: "address" },
+            { internalType: "uint16", name: "_recipientChain", type: "uint16" },
+            { internalType: "bytes32", name: "_recipient", type: "bytes32" },
+            { internalType: "uint256", name: "_arbiterFee", type: "uint256" },
+          ],
+          name: "createJumpgate",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ];
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        try {
+          errorP.innerHTML = "";
+          const factory = factoryInput.value;
+          const token = tokenInput.value;
+          const bridge = bridgeInput.value;
+          const recipientChain = Number(recipientChainInput.value);
+          const recipient = decodeTerraAddress(recipientInput.value);
+          const arbiterFee = Number(arbiterFeeInput.value);
+
+          const factoryContract = new web3.eth.Contract(
+            factoryAbi,
+            factory
+          );
+
+          const tx = await factoryContract.methods
+            .createJumpgate(
+              token,
+              bridge,
+              recipientChain,
+              recipient,
+              arbiterFee
+            )
+            .send({ from: account });
+
+          const receipt = await tx.wait(1);
+        } catch (error) {
+          console.error(error);
+          errorP.innerHTML = error.message;
+        }
+      });
+    </script>
+  </body>
+</html>
